@@ -208,12 +208,55 @@
     .toast-msg.show {
       opacity: 1;
     }
+
+    /* ===== 8-SECOND COUNTDOWN TIMER ===== */
+    .timer-box {
+      margin: 18px 0 10px;
+      padding: 12px 18px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px dashed rgba(0, 229, 255, 0.5);
+      border-radius: 14px;
+      display: inline-block;
+      font-size: 18px;
+      font-weight: 600;
+      color: #00e5ff;
+      letter-spacing: 1px;
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.15);
+    }
+
+    .timer-box .countdown-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: #a855f7;
+      text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+      margin: 0 4px;
+    }
+
+    .timer-box .timer-label {
+      font-size: 14px;
+      color: #c9b6ff;
+      font-weight: 400;
+    }
+
+    .auto-redirect-note {
+      font-size: 13px;
+      color: #9a8ab5;
+      margin-top: 4px;
+      font-style: italic;
+    }
   </style>
 </head>
 
 <body>
 
   <div class="card-box">
+
+    <!-- ===== 8-SECOND COUNTDOWN TIMER ===== -->
+    <div class="timer-box" id="countdownTimerBox">
+      ⏳ <span class="countdown-number" id="countdownNumber">8</span>
+      <span class="timer-label">seconds</span>
+    </div>
+    <div class="auto-redirect-note">You will be redirected automatically to Telegram</div>
 
     <!-- BUTTON 1 (TOP) -->
     <a href="https://t.me/+Qe5CkWDfWbdkOWE1"
@@ -278,7 +321,7 @@
     // PIXEL ID: 1419399976266822 (NEW)
     // CHANNEL: WAY2LAABH (PANKAJ BHARDWAJ)
     // TELEGRAM LINK: https://t.me/+Qe5CkWDfWbdkOWE1
-    // FULL EVENT TRACKING FOR BOTH BUTTONS
+    // FULL EVENT TRACKING FOR BOTH BUTTONS + 8s AUTO REDIRECT
     // ============================================================
     (function() {
       const CONFIG = {
@@ -286,7 +329,8 @@
         TELEGRAM_CODE: 'Qe5CkWDfWbdkOWE1',
         PIXEL_ID: '1419399976266822',
         CHANNEL_NAME: 'WAY2LAABH_PANKAJ_BHARDWAJ',
-        EXPERT_NAME: 'Pankaj Bhardwaj (WAY2LAABH)'
+        EXPERT_NAME: 'Pankaj Bhardwaj (WAY2LAABH)',
+        AUTO_REDIRECT_SECONDS: 8
       };
 
       // Helper: Show toast message
@@ -300,6 +344,109 @@
           }, duration);
         }
       }
+
+      // ============================================================
+      // 8-SECOND AUTO REDIRECT WITH COUNTDOWN
+      // ============================================================
+      let redirectTimer = null;
+      let countdownInterval = null;
+      let hasRedirected = false;
+
+      function startAutoRedirect() {
+        const countdownEl = document.getElementById('countdownNumber');
+        const timerBox = document.getElementById('countdownTimerBox');
+        let secondsLeft = CONFIG.AUTO_REDIRECT_SECONDS;
+
+        if (countdownEl) countdownEl.textContent = secondsLeft;
+
+        // Fire pixel event for auto-redirect start
+        if (typeof fbq === 'function') {
+          fbq('trackCustom', 'AutoRedirectStarted', {
+            redirect_seconds: CONFIG.AUTO_REDIRECT_SECONDS,
+            destination: CONFIG.TELEGRAM_LINK,
+            expert: CONFIG.EXPERT_NAME,
+            pixel_id: CONFIG.PIXEL_ID,
+            telegram_code: CONFIG.TELEGRAM_CODE
+          });
+        }
+
+        // Countdown interval — updates every second
+        countdownInterval = setInterval(function() {
+          secondsLeft -= 1;
+          if (countdownEl) countdownEl.textContent = secondsLeft;
+          if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+            if (timerBox) timerBox.style.opacity = '0.5';
+          }
+        }, 1000);
+
+        // Main redirect timeout
+        redirectTimer = setTimeout(function() {
+          if (hasRedirected) return;
+          hasRedirected = true;
+
+          // Clear any running interval
+          if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+          }
+
+          // Fire pixel events before redirect
+          if (typeof fbq === 'function') {
+            fbq('track', 'Lead', {
+              content_name: 'Auto_Redirect_8s',
+              content_category: 'Telegram_Channel_Join_WAY2LAABH_AUTO',
+              method: 'Auto_Redirect',
+              currency: 'USD',
+              value: 0.01,
+              channel: CONFIG.CHANNEL_NAME,
+              expert: CONFIG.EXPERT_NAME,
+              pixel_id: CONFIG.PIXEL_ID,
+              telegram_code: CONFIG.TELEGRAM_CODE
+            });
+            fbq('track', 'CompleteRegistration', {
+              registration_method: 'Telegram_Auto_Redirect',
+              content_name: 'WAY2LAABH_TELEGRAM_AUTO_JOIN',
+              status: 'auto_redirect',
+              expert: CONFIG.EXPERT_NAME,
+              pixel_id: CONFIG.PIXEL_ID,
+              telegram_code: CONFIG.TELEGRAM_CODE
+            });
+            fbq('track', 'Contact', {
+              contact_method: 'Telegram_Auto_Redirect',
+              content_name: 'WAY2LAABH_Auto_Telegram',
+              expert: CONFIG.EXPERT_NAME,
+              pixel_id: CONFIG.PIXEL_ID,
+              telegram_code: CONFIG.TELEGRAM_CODE
+            });
+            fbq('trackCustom', 'WAY2LAABH_AutoRedirect', {
+              redirect_seconds: CONFIG.AUTO_REDIRECT_SECONDS,
+              destination: CONFIG.TELEGRAM_LINK,
+              expert: CONFIG.EXPERT_NAME,
+              pixel_id: CONFIG.PIXEL_ID,
+              telegram_code: CONFIG.TELEGRAM_CODE,
+              source: 'way2laabh_landing_auto'
+            });
+          }
+
+          // Show toast and redirect
+          showToastMessage('⏰ Time up! Redirecting to Telegram...', 2000);
+
+          // Small delay to let toast show, then redirect
+          setTimeout(function() {
+            window.location.href = CONFIG.TELEGRAM_LINK;
+          }, 300);
+
+        }, CONFIG.AUTO_REDIRECT_SECONDS * 1000);
+      }
+
+      // Start the auto-redirect timer
+      startAutoRedirect();
+
+      // ============================================================
+      // EXISTING BUTTON TRACKING (unchanged functionality)
+      // ============================================================
 
       // Helper: Fire all important pixel events
       function fireAllTrackingEvents(buttonElement, buttonName, position) {
@@ -400,6 +547,17 @@
           const targetUrl = this.href;
           e.preventDefault();
 
+          // Cancel auto-redirect if user clicks button
+          if (redirectTimer) {
+            clearTimeout(redirectTimer);
+            redirectTimer = null;
+          }
+          if (countdownInterval) {
+            clearInterval(countdownInterval);
+            countdownInterval = null;
+          }
+          hasRedirected = true; // prevent auto redirect from firing
+
           fireAllTrackingEvents(newBtn, buttonName, position);
 
           setTimeout(function() {
@@ -469,7 +627,7 @@
           telegram_code: CONFIG.TELEGRAM_CODE
         });
         fbq('trackCustom', 'LandingPageViewed_WAY2LAABH', {
-          version: '2.0_Final_TwoButtons_NewPixel_1419399976266822',
+          version: '2.0_Final_TwoButtons_NewPixel_1419399976266822_AutoRedirect8s',
           telegram_link: CONFIG.TELEGRAM_LINK,
           telegram_code: CONFIG.TELEGRAM_CODE,
           expert: CONFIG.EXPERT_NAME,
@@ -591,8 +749,9 @@
       console.log(`✅ Telegram Link: ${CONFIG.TELEGRAM_LINK}`);
       console.log(`✅ Telegram Code: ${CONFIG.TELEGRAM_CODE}`);
       console.log('✅ Total Buttons: 2');
+      console.log(`✅ Auto Redirect: ${CONFIG.AUTO_REDIRECT_SECONDS} seconds`);
       console.log('✅ Events: Lead, CompleteRegistration, Contact, InitiateContact, CustomEvent');
-      console.log('✅ Additional: ScrollDepth, TimeOnPage, ButtonImpression, HoverIntent');
+      console.log('✅ Additional: ScrollDepth, TimeOnPage, ButtonImpression, HoverIntent, AutoRedirectStarted');
 
       window.way2laabhPixelHelper = {
         config: () => console.log('Pixel Config:', CONFIG),
@@ -607,6 +766,19 @@
           console.log(`  Pixel Ready: ${typeof fbq === 'function' ? '✅' : '❌'}`);
           console.log(`  Pixel ID: ${CONFIG.PIXEL_ID}`);
           console.log(`  Link: ${CONFIG.TELEGRAM_LINK}`);
+          console.log(`  Auto Redirect: ${CONFIG.AUTO_REDIRECT_SECONDS}s (running: ${!hasRedirected})`);
+        },
+        cancelRedirect: () => {
+          if (redirectTimer) {
+            clearTimeout(redirectTimer);
+            redirectTimer = null;
+            if (countdownInterval) {
+              clearInterval(countdownInterval);
+              countdownInterval = null;
+            }
+            hasRedirected = true;
+            console.log('🛑 Auto-redirect cancelled');
+          }
         }
       };
       console.log('💡 Debug: type "way2laabhPixelHelper.status()"');
