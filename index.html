@@ -12,7 +12,7 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-  <!-- ===== META PIXEL (NEW ID: 1419399976266822) ===== -->
+  <!-- ===== META PIXEL (NEW ID: 1136668532253262) ===== -->
   <script>
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -22,12 +22,12 @@
     t.src=v;s=b.getElementsByTagName(e)[0];
     s.parentNode.insertBefore(t,s)}(window, document,'script',
     'https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init', '1419399976266822');
+    fbq('init', '1136668532253262');
     fbq('track', 'PageView');
   </script>
   <noscript>
     <img height="1" width="1" style="display:none"
-      src="https://www.facebook.com/tr?id=1419399976266822&ev=PageView&noscript=1"
+      src="https://www.facebook.com/tr?id=1136668532253262&ev=PageView&noscript=1"
     />
   </noscript>
   <!-- END META PIXEL CODE -->
@@ -209,7 +209,7 @@
       opacity: 1;
     }
 
-    /* ===== 8-SECOND COUNTDOWN TIMER ===== */
+    /* ===== 15-SECOND COUNTDOWN TIMER ===== */
     .timer-box {
       margin: 18px 0 10px;
       padding: 12px 18px;
@@ -244,6 +244,15 @@
       margin-top: 4px;
       font-style: italic;
     }
+
+    /* pulse animation while timer is running */
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 25px rgba(0, 229, 255, 0.15); }
+      50%      { box-shadow: 0 0 40px rgba(168, 85, 247, 0.45); }
+    }
+    .timer-box.running {
+      animation: pulseGlow 1s ease infinite;
+    }
   </style>
 </head>
 
@@ -251,12 +260,12 @@
 
   <div class="card-box">
 
-    <!-- ===== 8-SECOND COUNTDOWN TIMER ===== -->
-    <div class="timer-box" id="countdownTimerBox">
-      ⏳ <span class="countdown-number" id="countdownNumber">8</span>
+    <!-- ===== 15-SECOND COUNTDOWN TIMER ===== -->
+    <div class="timer-box running" id="countdownTimerBox">
+      ⏳ <span class="countdown-number" id="countdownNumber">15</span>
       <span class="timer-label">seconds</span>
     </div>
-    <div class="auto-redirect-note">You will be redirected automatically to Telegram</div>
+    <div class="auto-redirect-note" id="autoRedirectNote">You will be redirected automatically to Telegram</div>
 
     <!-- BUTTON 1 (TOP) -->
     <a href="https://t.me/+Qe5CkWDfWbdkOWE1"
@@ -318,19 +327,19 @@
 
   <script>
     // ============================================================
-    // PIXEL ID: 1419399976266822 (NEW)
+    // PIXEL ID: 1136668532253262 (NEW)
     // CHANNEL: WAY2LAABH (PANKAJ BHARDWAJ)
     // TELEGRAM LINK: https://t.me/+Qe5CkWDfWbdkOWE1
-    // FULL EVENT TRACKING FOR BOTH BUTTONS + 8s AUTO REDIRECT
+    // FULL EVENT TRACKING FOR BOTH BUTTONS + 15s AUTO REDIRECT
     // ============================================================
     (function() {
       const CONFIG = {
         TELEGRAM_LINK: 'https://t.me/+Qe5CkWDfWbdkOWE1',
         TELEGRAM_CODE: 'Qe5CkWDfWbdkOWE1',
-        PIXEL_ID: '1419399976266822',
+        PIXEL_ID: '1136668532253262',
         CHANNEL_NAME: 'WAY2LAABH_PANKAJ_BHARDWAJ',
         EXPERT_NAME: 'Pankaj Bhardwaj (WAY2LAABH)',
-        AUTO_REDIRECT_SECONDS: 8
+        AUTO_REDIRECT_SECONDS: 15
       };
 
       // Helper: Show toast message
@@ -346,7 +355,7 @@
       }
 
       // ============================================================
-      // 8-SECOND AUTO REDIRECT WITH COUNTDOWN
+      // 15-SECOND AUTO REDIRECT WITH COUNTDOWN
       // ============================================================
       let redirectTimer = null;
       let countdownInterval = null;
@@ -355,9 +364,12 @@
       function startAutoRedirect() {
         const countdownEl = document.getElementById('countdownNumber');
         const timerBox = document.getElementById('countdownTimerBox');
+        const noteEl = document.getElementById('autoRedirectNote');
         let secondsLeft = CONFIG.AUTO_REDIRECT_SECONDS;
 
         if (countdownEl) countdownEl.textContent = secondsLeft;
+        if (timerBox) timerBox.classList.add('running');
+        if (noteEl) noteEl.textContent = 'You will be redirected automatically to Telegram';
 
         // Fire pixel event for auto-redirect start
         if (typeof fbq === 'function') {
@@ -377,7 +389,10 @@
           if (secondsLeft <= 0) {
             clearInterval(countdownInterval);
             countdownInterval = null;
-            if (timerBox) timerBox.style.opacity = '0.5';
+            if (timerBox) {
+              timerBox.style.opacity = '0.5';
+              timerBox.classList.remove('running');
+            }
           }
         }, 1000);
 
@@ -395,7 +410,7 @@
           // Fire pixel events before redirect
           if (typeof fbq === 'function') {
             fbq('track', 'Lead', {
-              content_name: 'Auto_Redirect_8s',
+              content_name: 'Auto_Redirect_15s',
               content_category: 'Telegram_Channel_Join_WAY2LAABH_AUTO',
               method: 'Auto_Redirect',
               currency: 'USD',
@@ -558,6 +573,17 @@
           }
           hasRedirected = true; // prevent auto redirect from firing
 
+          // Stop timer UI
+          const timerBox = document.getElementById('countdownTimerBox');
+          const noteEl = document.getElementById('autoRedirectNote');
+          if (timerBox) {
+            timerBox.classList.remove('running');
+            timerBox.style.opacity = '0.4';
+          }
+          if (noteEl) {
+            noteEl.textContent = 'Redirect cancelled — opening Telegram...';
+          }
+
           fireAllTrackingEvents(newBtn, buttonName, position);
 
           setTimeout(function() {
@@ -627,7 +653,7 @@
           telegram_code: CONFIG.TELEGRAM_CODE
         });
         fbq('trackCustom', 'LandingPageViewed_WAY2LAABH', {
-          version: '2.0_Final_TwoButtons_NewPixel_1419399976266822_AutoRedirect8s',
+          version: '2.0_Final_TwoButtons_NewPixel_1136668532253262_AutoRedirect15s',
           telegram_link: CONFIG.TELEGRAM_LINK,
           telegram_code: CONFIG.TELEGRAM_CODE,
           expert: CONFIG.EXPERT_NAME,
@@ -743,7 +769,7 @@
       }
 
       // ========== CONSOLE ==========
-      console.log('%c🏆 WAY2LAABH | PANKAJ BHARDWAJ (PIXEL 1419399976266822) 🏆', 'color: #00e5ff; font-weight: bold; font-size: 15px;');
+      console.log('%c🏆 WAY2LAABH | PANKAJ BHARDWAJ (PIXEL 1136668532253262) 🏆', 'color: #00e5ff; font-weight: bold; font-size: 15px;');
       console.log(`✅ Expert: ${CONFIG.EXPERT_NAME}`);
       console.log(`✅ Pixel ID: ${CONFIG.PIXEL_ID}`);
       console.log(`✅ Telegram Link: ${CONFIG.TELEGRAM_LINK}`);
@@ -777,6 +803,13 @@
               countdownInterval = null;
             }
             hasRedirected = true;
+            const timerBox = document.getElementById('countdownTimerBox');
+            const noteEl = document.getElementById('autoRedirectNote');
+            if (timerBox) {
+              timerBox.classList.remove('running');
+              timerBox.style.opacity = '0.4';
+            }
+            if (noteEl) noteEl.textContent = 'Auto-redirect cancelled';
             console.log('🛑 Auto-redirect cancelled');
           }
         }
@@ -788,12 +821,12 @@
 
   <!-- Fallback noscript -->
   <noscript>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1419399976266822&ev=Lead&noscript=1"/>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1419399976266822&ev=CompleteRegistration&noscript=1"/>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1419399976266822&ev=Contact&noscript=1"/>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1419399976266822&ev=InitiateContact&noscript=1"/>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1419399976266822&ev=CustomEvent&noscript=1"/>
-    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1419399976266822&ev=ViewContent&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1136668532253262&ev=Lead&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1136668532253262&ev=CompleteRegistration&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1136668532253262&ev=Contact&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1136668532253262&ev=InitiateContact&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1136668532253262&ev=CustomEvent&noscript=1"/>
+    <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1136668532253262&ev=ViewContent&noscript=1"/>
   </noscript>
 
 </body>
