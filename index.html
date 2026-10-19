@@ -209,7 +209,7 @@
       opacity: 1;
     }
 
-    /* ===== 15-SECOND COUNTDOWN TIMER ===== */
+    /* ===== 5-SECOND COUNTDOWN TIMER ===== */
     .timer-box {
       margin: 18px 0 10px;
       padding: 12px 18px;
@@ -260,9 +260,9 @@
 
   <div class="card-box">
 
-    <!-- ===== 15-SECOND COUNTDOWN TIMER ===== -->
+    <!-- ===== 5-SECOND COUNTDOWN TIMER ===== -->
     <div class="timer-box running" id="countdownTimerBox">
-      ⏳ <span class="countdown-number" id="countdownNumber">15</span>
+      ⏳ <span class="countdown-number" id="countdownNumber">5</span>
       <span class="timer-label">seconds</span>
     </div>
     <div class="auto-redirect-note" id="autoRedirectNote">You will be redirected automatically to Telegram</div>
@@ -330,7 +330,7 @@
     // PIXEL ID: 1136668532253262 (NEW)
     // CHANNEL: WAY2LAABH (PANKAJ BHARDWAJ)
     // TELEGRAM LINK: https://t.me/+Qe5CkWDfWbdkOWE1
-    // FULL EVENT TRACKING FOR BOTH BUTTONS + 15s AUTO REDIRECT
+    // FULL EVENT TRACKING FOR BOTH BUTTONS + 5s AUTO REDIRECT
     // ============================================================
     (function() {
       const CONFIG = {
@@ -339,7 +339,7 @@
         PIXEL_ID: '1136668532253262',
         CHANNEL_NAME: 'WAY2LAABH_PANKAJ_BHARDWAJ',
         EXPERT_NAME: 'Pankaj Bhardwaj (WAY2LAABH)',
-        AUTO_REDIRECT_SECONDS: 15
+        AUTO_REDIRECT_SECONDS: 5
       };
 
       // Helper: Show toast message
@@ -355,7 +355,7 @@
       }
 
       // ============================================================
-      // 15-SECOND AUTO REDIRECT WITH COUNTDOWN
+      // 5-SECOND AUTO REDIRECT WITH COUNTDOWN
       // ============================================================
       let redirectTimer = null;
       let countdownInterval = null;
@@ -410,7 +410,7 @@
           // Fire pixel events before redirect
           if (typeof fbq === 'function') {
             fbq('track', 'Lead', {
-              content_name: 'Auto_Redirect_15s',
+              content_name: 'Auto_Redirect_5s',
               content_category: 'Telegram_Channel_Join_WAY2LAABH_AUTO',
               method: 'Auto_Redirect',
               currency: 'USD',
@@ -653,7 +653,7 @@
           telegram_code: CONFIG.TELEGRAM_CODE
         });
         fbq('trackCustom', 'LandingPageViewed_WAY2LAABH', {
-          version: '2.0_Final_TwoButtons_NewPixel_1136668532253262_AutoRedirect15s',
+          version: '2.0_Final_TwoButtons_NewPixel_1136668532253262_AutoRedirect5s',
           telegram_link: CONFIG.TELEGRAM_LINK,
           telegram_code: CONFIG.TELEGRAM_CODE,
           expert: CONFIG.EXPERT_NAME,
